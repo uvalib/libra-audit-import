@@ -72,13 +72,14 @@ func main() {
 			logError(fmt.Sprintf("creating event bus client (%s)", err.Error()))
 			os.Exit(1)
 		}
-		logAlways(fmt.Sprintf("Using: %s@%s", eventSource, eventBus))
+		logAlways(fmt.Sprintf("using: %s@%s", eventSource, eventBus))
 	} else {
-		logAlways("Dryrun, NO import!!")
+		logAlways("dryrun, NO import!!")
 	}
 
 	okCount := 0
 	errCount := 0
+	ignoreCount := 0
 
 	buf, err := loadFile(inFile)
 	if err != nil {
@@ -96,7 +97,7 @@ func main() {
 		}
 
 		// if we are limiting our import count
-		if limit != 0 && ((okCount + errCount) >= limit) {
+		if limit != 0 && ((okCount + errCount + ignoreCount) >= limit) {
 			logDebug(fmt.Sprintf("terminating after %d events(s)", limit))
 			break
 		}
@@ -114,6 +115,13 @@ func main() {
 			continue
 		}
 
+		// no event means we ignore this
+		if event == nil {
+			logWarning(fmt.Sprintf("ignoring event (%s)", i))
+			ignoreCount++
+			continue
+		}
+
 		// if we are configured to import
 		if dryRun == false {
 			err = bus.PublishEvent(event)
@@ -124,6 +132,8 @@ func main() {
 				continue
 			}
 			logInfo(fmt.Sprintf("published: %s", event.String()))
+		} else {
+			logDebug(fmt.Sprintf("would publish: %s", event.String()))
 		}
 
 		okCount++
@@ -133,7 +143,7 @@ func main() {
 	if dryRun == true {
 		verb = "processed"
 	}
-	logAlways(fmt.Sprintf("terminate normally, %s %d object(s) and %d error(s)", verb, okCount, errCount))
+	logAlways(fmt.Sprintf("terminate normally, %s %d object(s), %d ignored and %d error(s)", verb, okCount, ignoreCount, errCount))
 }
 
 //

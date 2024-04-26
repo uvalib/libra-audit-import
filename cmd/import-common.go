@@ -10,6 +10,15 @@ import (
 	"os"
 )
 
+var emptyField = "empty"
+var fileFieldName = "file"
+
+// these timestamps are always in the form: 2017-06-29 19:47:29 UTC
+// so it's easy to fix them
+func fixTimeStamp(timestamp string) string {
+	return timestamp[:10] + "T" + timestamp[11:19] + "Z"
+}
+
 func loadFile(filename string) ([]byte, error) {
 	buf, err := os.ReadFile(filename)
 	if err != nil {
