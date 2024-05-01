@@ -47,6 +47,8 @@ func makeEtdEvent(namespace string, auditLine string) (*uvalibrabus.UvaBusEvent,
 		return nil, err
 	}
 
+	logDebug(fmt.Sprintf("audit event: %s", auditEvent.String()))
+
 	busEvent := uvalibrabus.UvaBusEvent{
 		EventName:  uvalibrabus.EventFieldUpdate,
 		Namespace:  namespace,

@@ -31,24 +31,6 @@ func makeOpenEvent(namespace string, auditLine string) (*uvalibrabus.UvaBusEvent
 
 	var buf []byte
 	var err error
-	//var eventName string
-
-	// audit events that refer to a 'file' are handled differently
-	//	if parts[openFieldIx] == fileField {
-	//
-	//		before := ""
-	//		after := ""
-	//
-	//		if parts[openBeforeIx] == emptyStr {
-	//			eventName = uvalibrabus.EventFileCreate
-	//		} else if parts[openAfterIx] == emptyStr {
-	//			eventName = uvalibrabus.EventFileDelete
-	//		} else {
-	//			eventName = uvalibrabus.EventFileUpdate
-	//		}
-	//
-	//	} else {
-	//eventName = uvalibrabus.EventFieldUpdate
 	auditEvent := uvalibrabus.UvaAuditEvent{
 		Who:       parts[openWhoIx],
 		FieldName: parts[openFieldIx],
@@ -59,7 +41,8 @@ func makeOpenEvent(namespace string, auditLine string) (*uvalibrabus.UvaBusEvent
 	if err != nil {
 		return nil, err
 	}
-	//	}
+
+	logDebug(fmt.Sprintf("audit event: %s", auditEvent.String()))
 
 	busEvent := uvalibrabus.UvaBusEvent{
 		EventName:  uvalibrabus.EventFieldUpdate,
