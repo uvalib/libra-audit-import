@@ -18,14 +18,12 @@ func main() {
 	var eventSource string
 	var namespace string
 	var inFile string
-	var importMode string
 	var dryRun bool
 	var limit int
 
 	flag.StringVar(&eventBus, "bus", "", "Event bus name")
 	flag.StringVar(&eventSource, "source", "", "Event source name")
 	flag.StringVar(&namespace, "namespace", "", "Namespace to import")
-	flag.StringVar(&importMode, "importmode", "", "Import mode, either etd or open")
 	flag.StringVar(&inFile, "infile", "", "Import file")
 	flag.BoolVar(&dryRun, "dryrun", false, "Process but do not actually import")
 	flag.IntVar(&limit, "limit", 0, "Number of items to import, 0 for no limit")
@@ -36,7 +34,6 @@ func main() {
 	if len(eventBus) == 0 ||
 		len(eventSource) == 0 ||
 		len(namespace) == 0 ||
-		len(importMode) == 0 ||
 		len(inFile) == 0 {
 		flag.PrintDefaults()
 		os.Exit(1)
@@ -44,11 +41,6 @@ func main() {
 
 	if fileExists(inFile) == false {
 		logError("import file does not exist or is not readable")
-		os.Exit(1)
-	}
-
-	if importMode != "etd" && importMode != "open" {
-		logError("import mode must be etd|open")
 		os.Exit(1)
 	}
 
@@ -102,12 +94,7 @@ func main() {
 			break
 		}
 
-		var event *uvalibrabus.UvaBusEvent
-		if importMode == "etd" {
-			event, err = makeEtdEvent(namespace, i)
-		} else {
-			event, err = makeOpenEvent(namespace, i)
-		}
+		var event, err = makeEtdEvent(namespace, i)
 
 		if err != nil {
 			logError(fmt.Sprintf("creating event (%s), continuing", err.Error()))
